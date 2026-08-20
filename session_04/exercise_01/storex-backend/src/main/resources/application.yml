@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: storex-backend
+  jpa:
+    hibernate:
+      ddl-auto: update
+  datasource:
+    driver-class-name: org.postgresql.Driver
