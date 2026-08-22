@@ -1,0 +1,3 @@
+CREATE DATABASE quickbite_restaurant;
+CREATE DATABASE quickbite_order;
+CREATE DATABASE quickbite_notification;
