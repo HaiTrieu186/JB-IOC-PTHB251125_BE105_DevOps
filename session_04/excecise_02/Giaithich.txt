@@ -1,0 +1,51 @@
+# Giải thích healthcheck
+
+## Vấn đề
+`depends_on` mặc định chỉ đợi container start xong, chứ không đợi service bên trong đã sẵn sàng nhận connect. Ví dụ container postgres "Running" rồi nhưng Postgres engine bên trong có thể chưa kịp mở port 5432, nên backend start lên là bị connection refused liền.
+
+## Cách sửa - dùng healthcheck
+
+**Postgres:**
+```yaml
+healthcheck:
+  test: ["CMD-SHELL", "pg_isready -U admin -d storex_db"]
+  interval: 5s
+  timeout: 5s
+  retries: 5
+  start_period: 10s
+```
+`pg_isready` là lệnh có sẵn trong image postgres, check xem DB đã nhận connect được chưa. Cứ 5s check 1 lần, sai 5 lần liên tục mới bị coi là unhealthy. `start_period` là khoảng thời gian đầu cho container khởi động, chưa tính fail vào lần retry.
+
+**Redis:**
+```yaml
+healthcheck:
+  test: ["CMD", "redis-cli", "ping"]
+  interval: 5s
+  timeout: 3s
+  retries: 5
+```
+Redis có lệnh ping, nếu server sẵn sàng nó trả về PONG.
+
+## depends_on với condition
+
+```yaml
+backend:
+  depends_on:
+    postgres:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+```
+Thay vì chỉ đợi container start như trước, giờ backend sẽ đợi postgres và redis healthcheck pass rồi mới chạy. Nhờ vậy backend không bị crash lúc đầu nữa.
+
+## Volume cho postgres
+
+```yaml
+postgres:
+  volumes:
+    - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
+```
+Data thật của Postgres nằm ở `/var/lib/postgresql/data` trong container. Không mount volume thì data này chỉ tồn tại tạm trong container, xóa container là mất luôn. Mount volume ra ngoài thì data được Docker lưu riêng, container mới lên lại vẫn đọc được data cũ (miễn là không down bằng `-v`, vì `-v` sẽ xóa luôn volume).
