@@ -1,0 +1,9 @@
+server:
+    port: 8080
+spring:
+    application:
+        name: storex-backend
+    jpa:
+        hibernate:
+            ddl-auto: update
+        show-sql: true
