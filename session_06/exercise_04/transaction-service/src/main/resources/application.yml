@@ -1,0 +1,11 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: transaction-service
+
+# Địa chỉ nội bộ của account-service trong Docker network
+# Dùng service name "account-service" thay vì localhost/IP tĩnh
+account-service:
+  base-url: ${ACCOUNT_SERVICE_URL:http://account-service:8080}
