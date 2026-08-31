@@ -1,0 +1,14 @@
+Bước 1: khởi tạo và lập trình cho payment-service (ở bài này em đang để một service chưa có nghiệp vụ)
+
+Bước 2: Vào GitHub tạo Token truy cập
+
+Bước 3: Mở ubuntu, tạo biên token export CR_PAT='token vừa tạo'
+
+Bước 4: echo $CR_PAT | docker login ghcr.io -u HaiTrieu186 --password-stdin 
+ ==> In ra Login Succeeded  (Đăng nhập thành công vào GitHub)
+
+Bước 5: cd payment-service --> ./gradlew clean bootJar (em dung clean cho chắc)
+
+Bước 6: docker build -t ghcr.io/haitrieu186/payment-service:1.0.0 --> tạo image với cách đặt tên chuẩn.
+
+Bước 7: push lên GitHub container registry -> docker push ghcr.io/haitrieu186/payment-service:1.0.0
