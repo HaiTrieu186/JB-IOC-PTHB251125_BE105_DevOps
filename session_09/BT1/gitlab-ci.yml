@@ -1,0 +1,9 @@
+stages:
+  - build_app
+
+build_job:
+  stage: build_app
+  image: eclipse-temurin:17-jdk-alpine
+  script:
+    - chmod +x ./gradlew
+    - ./gradlew clean build -x test
