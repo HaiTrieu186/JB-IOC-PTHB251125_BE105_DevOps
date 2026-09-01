@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    # ${...} nghĩa là: nếu có biến môi trường thì dùng biến đó,
+    # nếu không có (chạy local) thì dùng giá trị mặc định sau dấu ":"
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/hr_management}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update   # tự tạo bảng theo Entity, đơn giản cho môi trường học/test
+    show-sql: true

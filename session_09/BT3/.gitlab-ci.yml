@@ -1,0 +1,44 @@
+stages:
+  - test
+  - build
+
+variables:
+  POSTGRES_DB: hr_management
+  POSTGRES_USER: gitlab_test
+  POSTGRES_PASSWORD: gitlab_test_pwd
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/$POSTGRES_DB"
+  SPRING_DATASOURCE_USERNAME: "$POSTGRES_USER"
+  SPRING_DATASOURCE_PASSWORD: "$POSTGRES_PASSWORD"
+  GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
+  # Đường dẫn tới thư mục con chứa project Spring Boot
+  PROJECT_DIR: "demo-spring-project"
+
+cache:
+  key: "$CI_COMMIT_REF_SLUG"
+  paths:
+    - $PROJECT_DIR/.gradle/
+
+test:
+  stage: test
+  image: gradle:7.6-jdk17
+  services:
+    - name: postgres:14-alpine
+      alias: postgres
+  script:
+    - cd $PROJECT_DIR
+    - chmod +x ./gradlew
+    - ./gradlew test
+
+build:
+  stage: build
+  image: gradle:7.6-jdk17
+  script:
+    - cd $PROJECT_DIR
+    - chmod +x ./gradlew
+    - ./gradlew build -x test
+  artifacts:
+    paths:
+      - $PROJECT_DIR/build/libs/*.jar
+    expire_in: 1 day
+  needs:
+    - test
