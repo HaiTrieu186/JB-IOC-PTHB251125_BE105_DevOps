@@ -1,0 +1,49 @@
+# ==========================================
+# BÀI TẬP 3: TĂNG CƯỜNG BẢO MẬT SSH
+# ==========================================
+
+# 1. TẠO CẶP KHÓA SSH TRÊN MÁY LOCAL (WINDOWS POWERSHELL)
+# Tạo khóa mới tên là vps_deploy_key để không trùng với khóa Git cũ
+ssh-keygen -t ed25519 -f "C:\Users\MSI\.ssh\vps_deploy_key" -C "deploy_vps_key"
+
+# Đọc và copy nội dung Public Key
+cat C:\Users\MSI\.ssh\vps_deploy_key.pub
+
+
+# 2. ĐƯA PUBLIC KEY LÊN VPS (TERMINAL VPS - QUYỀN ROOT)
+# Chuyển sang user deploy
+su - deploy
+
+# Tạo thư mục .ssh và file authorized_keys
+mkdir -p ~/.ssh
+nano ~/.ssh/authorized_keys
+# (Tại màn hình nano, thực hiện Paste nội dung Public Key đã copy ở Bước 1 vào, sau đó Save & Exit)
+
+# Phân quyền bảo mật chuẩn cho thư mục và file khóa
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/authorized_keys
+
+# Thoát khỏi user deploy, trở về quyền root
+exit
+
+
+# 3. KIỂM TRA ĐĂNG NHẬP BẰNG SSH KEY (WINDOWS POWERSHELL)
+# Đăng nhập vào user deploy bằng file Private Key vừa tạo (thành công, không cần nhập password)
+ssh -i "C:\Users\MSI\.ssh\vps_deploy_key" deploy@103.74.101.146
+
+
+# 4. KHÓA TÍNH NĂNG ĐĂNG NHẬP BẰNG PASSWORD VÀ KHÓA ROOT (TERMINAL VPS - QUYỀN ROOT)
+# Mở file cấu hình SSH
+nano /etc/ssh/sshd_config
+
+# (Trong file, tìm và chỉnh sửa các dòng sau:)
+# PermitRootLogin no
+# PasswordAuthentication no
+
+# Khởi động lại dịch vụ SSH để áp dụng cấu hình mới
+systemctl restart ssh
+
+
+# 5. KIỂM TRA LẠI CẤU HÌNH BẢO MẬT (WINDOWS POWERSHELL)
+# Cố tình đăng nhập bằng user root để kiểm tra (Kết quả mong muốn: Bị từ chối - Permission denied)
+ssh root@103.74.101.146
