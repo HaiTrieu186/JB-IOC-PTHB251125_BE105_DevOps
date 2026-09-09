@@ -1,0 +1,30 @@
+# 1. Tạo user deploy và cấp quyền sudo
+adduser deploy
+usermod -aG sudo deploy
+
+# 2. Chuyển sang user deploy
+su - deploy
+
+# 3. Gỡ bỏ Docker cũ
+for pkg in docker.io docker-doc docker-compose podman-docker containerd runc; do sudo apt-get remove $pkg; done
+
+# 4. Cài đặt các gói phụ thuộc và nạp khóa GPG của Docker
+sudo apt-get update
+sudo apt-get install ca-certificates curl gnupg -y
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+# 5. Thêm repository Docker
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# 6. Cài đặt Docker Engine và Docker Compose
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+
+# 7. Thêm user deploy vào group docker để chạy không cần sudo
+sudo usermod -aG docker deploy
+newgrp docker
+
+# 8. Kiểm tra phiên bản
+docker --version
