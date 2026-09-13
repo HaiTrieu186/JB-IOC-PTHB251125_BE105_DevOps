@@ -1,0 +1,26 @@
+Bai tap 1 - Xu ly su co sap Nginx
+
+1. Nguyen nhan loi
+
+Dong "proxy_pass http://localhost:8080" bi THIEU dau cham phay (;) o cuoi dong. Moi chi thi (directive) trong Nginx bat buoc phai ket thuc bang dau ;, neu thieu, Nginx se hieu dong tiep theo (proxy_set_header Host $host;) la mot phan cua chinh dong proxy_pass, lam sai lech cu phap. Vi vay Nginx bao loi "unexpected proxy_set_header" ngay tai dong 7, du ban chat loi that su nam o dong 6 (thieu dau ;).
+
+2. Cau hinh sau khi sua
+
+server {
+    listen 80;
+    server_name example.com;
+
+    location / {
+        proxy_pass http://localhost:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+
+3. Lenh kiem tra va reload
+
+Kiem tra cu phap TRUOC khi ap dung, khong lam gian doan service dang chay:
+sudo nginx -t
+
+Neu ket qua "syntax is ok" va "test is successful" thi ap dung bang reload (khong dung restart de tranh gian doan ket noi dang online):
+sudo systemctl reload nginx
