@@ -1,0 +1,28 @@
+Bai tap 4 - Tich hop UFW va Docker
+
+1. Van de
+
+UFW thuc chat chi la lop quan ly de dung hon cho iptables. Khi Docker khoi dong, no tu dong chen them rule rieng vao chain DOCKER trong iptables, dat uu tien xu ly TRUOC cac rule ma UFW quan ly (chain ufw-user-input). Vi vay du UFW co deny port 8080, traffic van bi rule cua Docker xu ly va forward vao container truoc khi UFW kip chan - dan den port 8080 van bi public ra ngoai du UFW da chan.
+
+2. Cau hinh docker-compose.yml sau khi sua
+
+version: '3'
+services:
+  backend:
+    image: my-spring-boot-app:latest
+    ports:
+      - "127.0.0.1:8080:8080"
+
+3. Giai thich co che
+
+Cu phap port mapping cua Docker: "IP_HOST:PORT_HOST:PORT_CONTAINER"
+
+Neu chi viet "8080:8080" (khong co IP dung truoc), Docker mac dinh bind vao 0.0.0.0:8080, nghia la container lang nghe tren MOI network interface cua may host, bao gom ca interface public ra Internet.
+
+Khi viet "127.0.0.1:8080:8080", Docker chi bind cong vao dia chi loopback (127.0.0.1) cua may host - container chi nhan ket noi den tu CHINH may host do, khong mo ra bat ky network interface public nao.
+
+Ket qua:
+- Nginx (chay truc tiep tren cung VPS) van goi duoc proxy_pass http://127.0.0.1:8080 binh thuong, vi Nginx cung dang chay ngay tren host do.
+- Nguoi dung tu Internet go thang http://VPS_IP:8080 se bi connection refused ngay tu tang network, vi cong do khong duoc mo ra public interface - khong can UFW can thiep gi ca, vi Docker khong tao iptables rule public cho port nay nua.
+
+Day la cach khac phuc triet de hon so voi co chinh UFW de len Docker, vi giai quyet dung goc re van de - khong cho Docker mo public ngay tu dau.
