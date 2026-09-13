@@ -1,0 +1,28 @@
+Bai 2 - Nginx dinh tuyen theo duong dan
+
+File cau hinh: /etc/nginx/sites-available/ecommerce.conf
+
+server {
+    listen 80;
+    server_name haitrieu186.duckdns.org;
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+Giai thich X-Forwarded-For: neu khong truyen, backend se thay IP cua Nginx (127.0.0.1) thay vi IP that cua client.
+
+Ma nguon: https://github.com/HaiTrieu186/JB-IOC-PTHB251125_BE105_Devops_Session11_BT2
