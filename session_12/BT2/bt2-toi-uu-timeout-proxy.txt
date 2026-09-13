@@ -1,0 +1,28 @@
+Bai tap 2 - Toi uu Timeout cho Proxy
+
+1. Nguyen nhan loi 504 Gateway Timeout
+
+Mac dinh Nginx chi cho phep proxy_read_timeout 60 giay. Ung dung Spring Boot xu ly export bao cao mat 90 giay, vuot qua muc mac dinh, nen Nginx tu ngat ket noi truoc khi backend kip tra ket qua, tra ve loi 504.
+
+2. Cau hinh sau khi cap nhat
+
+server {
+    listen 80;
+    server_name api.example.com;
+
+    location /api/export/ {
+        proxy_pass http://localhost:8080;
+
+        proxy_connect_timeout 120s;
+        proxy_send_timeout 120s;
+        proxy_read_timeout 120s;
+    }
+}
+
+3. Giai thich cac thong so timeout
+
+- proxy_connect_timeout: thoi gian toi da Nginx cho de thiet lap ket noi TCP toi backend. Neu backend khong phan hoi bat tay ket noi kip, Nginx tra loi ngay (thuong do backend sap hoac sai port).
+
+- proxy_send_timeout: thoi gian toi da Nginx cho giua hai lan ghi du lieu lien tiep gui toi backend (vi du khi upload file lon). Neu backend khong nhan du lieu kip giua cac goi tin, ket noi bi dong.
+
+- proxy_read_timeout: quan trong nhat trong tinh huong nay - thoi gian toi da Nginx cho giua hai lan nhan du lieu tu backend. Vi API export can 90 giay xu ly, neu gia tri nay van o muc mac dinh 60s se gay loi 504. Tang len 120s de co du thoi gian xu ly cong them bien do an toan.
