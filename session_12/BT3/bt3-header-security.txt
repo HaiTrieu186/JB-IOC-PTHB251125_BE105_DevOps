@@ -1,0 +1,43 @@
+Bai tap 3 - Cau hinh Header Security
+
+1. Cau hinh Nginx da them (file: /etc/nginx/sites-available/ecommerce.conf)
+
+server {
+    server_name haitrieu186.duckdns.org;
+
+    add_header X-Frame-Options SAMEORIGIN always;
+    add_header X-Content-Type-Options nosniff always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+    location / {
+        proxy_pass http://localhost:8080;
+        ...
+    }
+
+    listen 443 ssl;
+    ssl_certificate /etc/letsencrypt/live/haitrieu186.duckdns.org/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/haitrieu186.duckdns.org/privkey.pem;
+}
+
+2. Y nghia tung header
+
+- X-Frame-Options: SAMEORIGIN -> chong Clickjacking, chi cho phep trang bi nhung vao iframe neu cung domain.
+- X-Content-Type-Options: nosniff -> chong MIME-sniffing, bat trinh duyet tin dung Content-Type server khai bao, khong tu doan loai file (ngan XSS qua file gia mao).
+- Strict-Transport-Security: max-age=31536000; includeSubDomains -> bat trinh duyet luon dung HTTPS khi truy cap domain trong 365 ngay toi, ap dung ca subdomain, chong tan cong downgrade/man-in-the-middle.
+- Tu khoa "always" o cuoi moi dong: dam bao header van xuat hien ke ca khi response loi (4xx, 5xx), khong chi khi thanh cong.
+
+3. Lenh kiem tra
+
+sudo nginx -t
+sudo systemctl reload nginx
+curl -I https://haitrieu186.duckdns.org/api/v1/customers
+
+4. Ket qua kiem chung
+
+HTTP/1.1 200
+Content-Type: application/json
+X-Frame-Options: SAMEORIGIN
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+
+Ca 3 header bao mat da duoc tra ve dung theo yeu cau.
