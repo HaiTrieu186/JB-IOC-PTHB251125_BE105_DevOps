@@ -1,0 +1,50 @@
+Bai 4 - Toi uu hoa Nginx va Reload khong gian doan
+
+1. Cho phep upload file toi 10MB (fix loi 413)
+
+File: /etc/nginx/sites-available/ecommerce.conf
+Them dong sau vao trong block server {}:
+
+client_max_body_size 10M;
+
+2. Bat Gzip nen file text/CSS/JS/JSON
+
+File: /etc/nginx/nginx.conf, trong block http {}:
+
+gzip on;
+gzip_vary on;
+gzip_proxied any;
+gzip_comp_level 6;
+gzip_buffers 16 8k;
+gzip_http_version 1.1;
+gzip_types text/plain text/css application/json application/javascript text/xml application/xml text/javascript;
+
+3. Bay: reload vs restart, lenh nao chay truoc
+
+Luon chay nginx -t TRUOC de kiem tra loi cu phap. Lenh nay chi kiem tra, khong lam thay doi gi den Nginx dang chay:
+
+sudo nginx -t
+
+Sau do moi ap dung bang reload, KHONG dung restart:
+
+sudo systemctl reload nginx
+
+Giai thich khac biet:
+- reload: Nginx doc lai config, tao worker process moi, doi worker cu xu ly xong request dang co roi moi tat. Socket lang nghe port 80/443 khong bi dong trong suot qua trinh -> khong request nao bi rot, goi la zero-downtime reload.
+- restart: Dung han toan bo Nginx (dong socket, kill het worker) roi khoi dong lai tu dau. Trong khoang thoi gian ngan do, moi request tu khach hang dang online se bi timeout hoac connection refused -> gay downtime that su, anh huong truc tiep trai nghiem va doanh thu.
+
+=> Tren production, luon dung nginx -t truoc, sau do reload, khong bao gio dung restart khi khong that su can thiet.
+
+4. Ket qua test
+
+curl -H "Accept-Encoding: gzip" -I https://haitrieu186.duckdns.org/api/v1/customers
+
+Ket qua:
+HTTP/1.1 200
+Content-Type: application/json
+Vary: Accept-Encoding
+Content-Encoding: gzip
+
+Xac nhan gzip da hoat dong dung, response duoc nen truoc khi gui ve client.
+
+Ma nguon: https://github.com/HaiTrieu186/JB-IOC-PTHB251125_BE105_Devops_Session11_BT2
