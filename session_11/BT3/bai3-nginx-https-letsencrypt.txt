@@ -1,0 +1,78 @@
+Bai 3 - Bao mat HTTPS voi Let's Encrypt
+
+1. Cai certbot
+
+sudo apt update
+sudo apt install snapd
+sudo snap install core
+sudo snap refresh core
+sudo snap install --classic certbot
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
+certbot --version
+
+2. Mo firewall cho HTTP/HTTPS
+
+sudo ufw allow OpenSSH
+sudo ufw allow 'Nginx Full'
+sudo ufw enable
+
+3. Xin cap chung chi SSL, Certbot tu dong cau hinh Nginx
+
+sudo certbot --nginx
+
+4. File cau hinh Nginx sau khi Certbot tu sua (domain: haitrieu186.duckdns.org)
+
+server {
+    server_name haitrieu186.duckdns.org;
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    listen 443 ssl;
+    ssl_certificate /etc/letsencrypt/live/haitrieu186.duckdns.org/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/haitrieu186.duckdns.org/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+}
+
+server {
+    if ($host = haitrieu186.duckdns.org) {
+        return 301 https://$host$request_uri;
+    }
+
+    listen 80;
+    server_name haitrieu186.duckdns.org;
+    return 404;
+}
+
+ssl_certificate tro toi file fullchain.pem (chua chung chi cong khai), ssl_certificate_key tro toi file privkey.pem (khoa rieng tu), ca 2 nam trong /etc/letsencrypt/live/<domain>/.
+
+5. Bay: tu dong gia han chung chi (het han sau 90 ngay)
+
+Khong can tu tao cronjob thu cong. Goi certbot cai qua snap da tu tao san 1 systemd timer chay 2 lan/ngay, tu kiem tra va gia han khi chung chi con duoi 30 ngay la het han.
+
+Kiem tra timer:
+systemctl list-timers | grep certbot
+
+Test thu renew (khong that su renew, chi mo phong):
+sudo certbot renew --dry-run
+
+6. Ket qua test
+
+https://haitrieu186.duckdns.org/api/v1/customers -> co khoa xanh, ra dung JSON
+http://haitrieu186.duckdns.org/api/v1/customers -> tu dong redirect 301 sang https
+
+Ma nguon: https://github.com/HaiTrieu186/JB-IOC-PTHB251125_BE105_Devops_Session11_BT2
