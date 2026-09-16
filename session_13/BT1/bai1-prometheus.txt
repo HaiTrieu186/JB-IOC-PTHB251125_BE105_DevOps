@@ -1,0 +1,40 @@
+Bai 1 - Khac phuc loi 
+
+1. localhost tro di dau khi Prometheus chay trong Docker?
+
+Khi Prometheus chay trong container, chu "localhost" trong config KHONG tro ra may host that, ma tro vao CHINH container Prometheus do (moi container co localhost rieng, co lap voi may host). Backend Spring Boot lai chay truc tiep tren may host (khong phai container). Vi vay khi Prometheus (trong container) goi localhost:8080, no dang tim cong 8080 BEN TRONG chinh no, khong tim tren may host that -> dan den loi connection refused.
+
+2. File prometheus.yml sau khi sua
+
+scrape_configs:
+  - job_name: 'backend'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8080']
+
+Neu Prometheus chay tren VPS Linux, can khai bao them trong docker-compose.yml de host.docker.internal hoat dong:
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+Cach thay the don gian hon, dung thang IP that cua VPS thay vi host.docker.internal:
+targets: ['<IP_VPS_THAT>:8080']
+
+3. Bay: endpoint cua Spring Boot la gi?
+
+Prometheus mac dinh goi vao duong dan /metrics, nhung Spring Boot (dung Spring Boot Actuator) khong dung duong dan do, ma dung:
+
+/actuator/prometheus
+
+Vi vay BAT BUOC phai them chi thi metrics_path: '/actuator/prometheus' vao config. Neu khong them, Prometheus se goi vao /metrics mac dinh, Spring Boot tra ve loi 404 Not Found, du ket noi mang (host/port) da dung.
+
+De endpoint nay hoat dong, Backend Spring Boot can co san dependency micrometer-registry-prometheus va bat expose endpoint trong application.yml:
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
