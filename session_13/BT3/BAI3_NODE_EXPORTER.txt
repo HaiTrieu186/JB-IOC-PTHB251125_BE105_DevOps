@@ -1,0 +1,27 @@
+# Bài 3 - Node Exporter
+
+## 1. Node Exporter
+Chạy bằng Docker, port mặc định: `9100`.
+
+Mount:
+- `/proc`: thông tin process và hệ thống.
+- `/sys`: thông tin kernel/phần cứng.
+- `/`: đọc thông tin filesystem của máy chủ.
+
+## 2. Prometheus
+Prometheus scrape Node Exporter tại:
+
+`node-exporter:9100`
+
+## 3. Kiểm tra
+
+```bash
+docker compose up -d
+```
+
+Mở:
+
+`http://localhost:9100/metrics`
+
+## 4. Lưu ý
+Không nên public port `9100` trực tiếp ra Internet vì Node Exporter không có mật khẩu mặc định.
