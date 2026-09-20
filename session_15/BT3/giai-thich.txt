@@ -1,0 +1,19 @@
+Nguyen nhan: rule HighCPUUsage qua nhay.
+- Nguong > 20 qua thap, chay 1 job nho cung vuot.
+- for: 10s qua ngan, spike vai giay cung bi bao. Ket qua la DevOps nhan email rac lien tuc (alert fatigue).
+
+Cac buoc sua:
+1. Mo alert_rules.yml, sua rule HighCPUUsage:
+   > 20  ->  > 85
+   for: 10s  ->  for: 5m
+2. Kiem tra cu phap bang promtool:
+   docker compose exec prometheus promtool check rules /etc/prometheus/alert_rules.yml
+   Ket qua dung: SUCCESS: 1 rules found
+3. Reload Prometheus:
+   curl -X POST http://localhost:9090/-/reload
+4. Vao http://localhost:9090/alerts de thay rule HighCPUUsage.
+
+Ket qua: chi khi CPU tren 85% lien tuc 5 phut moi bao. Neu giua chung tut xuong duoi 85% thi bo dem reset, spike ngan khong con gay bao dong.
+Trang thai alert: inactive -> pending (vuot nguong) -> firing (du 5 phut moi that su gui canh bao).
+
+Luu y: prometheus.yml phai co rule_files tro toi /etc/prometheus/alert_rules.yml, va docker-compose.yml phai mount file alert_rules.yml vao container thi Prometheus moi doc duoc rule.
