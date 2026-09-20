@@ -1,0 +1,19 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: node-exporter
+    static_configs:
+      - targets:
+          - 'app-server-1:9100'
+          - 'db-server-1:9100'
+          - 'cache-server-1:9100'
+
+  - job_name: ecommerce-api
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['ecommerce-api:8080']

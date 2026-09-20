@@ -1,0 +1,16 @@
+Muc dich: dung 1 dashboard duy nhat, co dropdown chon server, chon server nao thi bieu do doi theo.
+
+Cach tao bien instance:
+1. Mo dashboard > Dashboard settings (banh rang) > Variables > Add variable.
+2. Name: instance, Type: Query, Data source: Prometheus.
+3. Query: label_values(node_uname_info, instance)
+4. Refresh: On dashboard load, bam Apply.
+
+Giai thich query: label_values(metric, label) lay ra moi gia tri cua label instance trong metric node_uname_info. May nao chay Node Exporter deu co metric nay nen ra dung danh sach server dang chay (app-server-1, db-server-1, cache-server-1).
+
+Sua bieu do RAM:
+Cau cung: node_memory_MemFree_bytes{instance="192.168.1.10:9100"}
+Viet lai: node_memory_MemFree_bytes{instance="$instance"}
+Grafana se thay $instance bang server dang chon o dropdown. Unit chon bytes de tu doi sang MB/GB.
+
+Luu y: neu bat Multi-value hoac Include All thi phai doi dau = thanh =~ , tuc la {instance=~"$instance"}.
