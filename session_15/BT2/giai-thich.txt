@@ -1,0 +1,16 @@
+Nguyen nhan: scrape_interval va evaluation_interval dang de 1s.
+- scrape_interval: bao lau Prometheus cao metrics 1 lan. De 1s thi moi giay goi backend:8080 mot lan, nhieu du lieu gap 15 lan, ton CPU, RAM, o dia, backend cung bi goi lien tuc.
+- evaluation_interval: bao lau Prometheus danh gia rule (alert, recording rule) 1 lan. De 1s la vo ich vi du lieu moi chi co sau moi lan scrape.
+
+Cac buoc sua:
+1. Mo prometheus.yml, sua phan global:
+   scrape_interval: 1s  ->  15s
+   evaluation_interval: 1s  ->  15s
+2. Reload cau hinh (khong can restart container, vi compose co --web.enable-lifecycle):
+   curl -X POST http://localhost:9090/-/reload
+   Hoac restart: docker compose restart prometheus
+3. Kiem tra: vao http://localhost:9090/config thay scrape_interval: 15s la da ap dung.
+
+Ket qua: Prometheus nhe hon ro ret. Grafana lay du lieu tu Prometheus chu khong goi truc tiep app nen bieu do van lien mach, chi la moi 15 giay co 1 diem du lieu.
+
+Luu y: khi dung rate() thi cua so thoi gian nen tu [1m] tro len (it nhat gap 4 lan scrape_interval), khong dung [15s].
