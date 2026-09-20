@@ -1,0 +1,11 @@
+Cac buoc them Data Source Prometheus vao Grafana:
+1. Chay docker compose up -d, mo http://localhost:3000, dang nhap admin/admin.
+2. Vao Connections > Data sources > Add data source > chon Prometheus.
+3. O URL dien http://prometheus:9090.
+4. Bam Save & test, hien dau tich xanh la thanh cong.
+
+URL dung la http://prometheus:9090, khong phai http://localhost:9090.
+
+Ly do: moi container la mot may ao rieng, localhost trong container Grafana la chinh no, khong phai Prometheus nen se bi connection refused. Docker Compose dat cac container chung mot network va co DNS noi bo, nen Grafana goi Prometheus bang ten service (prometheus). Port 9090 la port ben trong container.
+
+Con localhost:9090 tren trinh duyet van vao duoc vi da map port ra may host (ports: "9090:9090").
