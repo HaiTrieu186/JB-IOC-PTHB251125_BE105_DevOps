@@ -1,0 +1,16 @@
+Nguyen nhan: datasource.yml dang hardcode IP 192.168.1.15. Khi docker compose khoi dong lai, Prometheus doi IP nen Grafana goi sai dia chi, dashboard bao No data.
+
+Cac buoc sua:
+1. Doc log loi Grafana:
+   docker compose logs grafana | grep -i error
+   Se thay loi dang: dial tcp 192.168.1.15:9090: connect: no route to host (hoac i/o timeout, connection refused).
+2. Sua grafana/provisioning/datasources/datasource.yml:
+   url: http://192.168.1.15:9090  ->  url: http://prometheus:9090
+3. Khoi dong lai Grafana:
+   docker compose restart grafana
+   (provisioning chi doc luc Grafana khoi dong nen phai restart)
+4. Kiem tra ket noi:
+   Vao Grafana (localhost:3000) > Connections > Data sources > Prometheus > Save & test, hien dau tich xanh la thanh cong.
+   Hoac chay: docker compose exec grafana wget -qO- http://prometheus:9090/-/healthy
+
+Vi sao dung ten service: IP cua container co the doi moi lan khoi dong lai, con ten service (prometheus) thi khong doi. DNS noi bo cua Docker luon phan giai ten nay ve IP hien tai cua container Prometheus, nen ket noi khong bi mat.
