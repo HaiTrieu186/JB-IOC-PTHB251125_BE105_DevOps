@@ -1,0 +1,20 @@
+Van de: static_configs ghi cung IP trong prometheus.yml, moi lan them/bot server phai sua file va reload Prometheus, rat mat cong khi scale up/down.
+
+Cach giai: dung file_sd_configs. Danh sach target tach ra file rieng targets.json, Prometheus tu theo doi file nay, thay doi la tu nap lai, khong can reload hay restart.
+
+Cac buoc lam:
+1. Sua prometheus.yml, thay static_configs bang:
+   file_sd_configs:
+     - files:
+         - /etc/prometheus/targets/targets.json
+       refresh_interval: 30s
+2. Tao targets.json:
+   [{"targets": ["10.0.0.51:8080", "10.0.0.52:8080"], "labels": {"env": "production"}}]
+   targets la danh sach dia chi can cao, labels la nhan gan vao moi target (env=production).
+3. Mount thu muc chua targets.json vao container trong docker-compose.yml:
+   ./targets:/etc/prometheus/targets:ro
+4. Chay docker compose up -d, vao http://localhost:9090/targets thay job microservices co 2 target kem nhan env="production" (2 IP mau nen se DOWN, khong sao).
+
+Kiem chung tu dong: them 1 IP moi vao targets.json, luu file, doi khoang 30 giay roi tai lai trang /targets, target moi tu xuat hien, khong can reload hay restart.
+
+Luu y: refresh_interval la chu ky Prometheus doc lai file de du phong (mac dinh 5 phut). Mount ca thu muc thay vi 1 file vi mot so trinh soan thao luu file bang cach tao file moi, khien container van thay noi dung cu.
