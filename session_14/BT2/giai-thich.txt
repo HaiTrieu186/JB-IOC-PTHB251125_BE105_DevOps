@@ -1,0 +1,16 @@
+Cac buoc lam:
+1. Them service node-exporter vao docker-compose.yml va them job node-exporter vao prometheus.yml (target node-exporter:9100), chay docker compose up -d.
+2. Vao Grafana (localhost:3000) > Dashboards > New > New dashboard > Add visualization > chon data source Prometheus.
+
+Bieu do 1 - Time series (CPU %):
+Query: 100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
+Giai thich: node_cpu_seconds_total la bo dem tang dan nen dung rate() de tinh toc do. Lay mode idle (CPU ranh), tinh trung binh cac core, lay 100 tru di ra % CPU dang dung.
+Unit: Standard options > Unit > Percent (0-100).
+
+Bieu do 2 - Stat (RAM con trong):
+Query: node_memory_MemFree_bytes
+Chon loai bieu do Stat de hien 1 con so lon.
+
+Bay don vi (Bytes -> MB/GB):
+Khong can nhan chia trong query. Chi can vao Standard options > Unit > chon bytes(IEC) hoac bytes(SI) (nhom Data), Grafana tu doi sang MB hoac GB cho dep.
+Khong chon unit "megabytes" vi unit do hieu gia tri da la MB roi, se hien sai.
