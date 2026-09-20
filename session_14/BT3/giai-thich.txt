@@ -1,0 +1,22 @@
+Cach import dashboard bang ID:
+1. Vao Grafana (localhost:3000) > Dashboards > New > Import.
+2. Nhap ID 4701 vao o "Import via grafana.com", bam Load.
+3. Chon data source Prometheus, bam Import.
+
+3 bieu do quan trong nhat:
+1. JVM Heap: vung nho chua object cua app. Neu duong "used" cu tang ma khong giam sau moi lan don thi la memory leak, cuoi cung app bi OutOfMemoryError.
+2. Garbage Collection (GC time/pause): JVM tu don object khong dung. GC chay nhieu hoac pause lau thi app bi cham, dung hinh. GC time cao thuong di kem Heap gan day.
+3. Threads: so luong thread dang chay. Tang lien tuc la co the bi ro thread hoac thread bi ket (deadlock, cho DB), gay ton RAM va cham app.
+
+Loi "No data" va cach sua:
+Dashboard 4701 co bien application o dau trang, moi bieu do deu loc theo bien nay. App khong gan label application thi bien rong nen bao No data.
+Sua trong application.yml, them:
+
+management:
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+Dong nay gan label application="ecommerce-api" vao moi metric nen bien co gia tri va bieu do hien du lieu.
+
+Can them dependency trong pom.xml: spring-boot-starter-actuator va micrometer-registry-prometheus. Bat endpoint prometheus (management.endpoints.web.exposure.include) va them job ecommerce-api voi metrics_path /actuator/prometheus vao prometheus.yml.
