@@ -1,0 +1,8 @@
+- Thêm dependency logstash-logback-encoder vào pom.xml
+- Mở logback-spring.xml, đổi encoder pattern -> encoder class="net.logstash.logback.encoder.LogstashEncoder"
+- Áp dụng cho cả CONSOLE và FILE appender
+- Tạo TestLogController, endpoint /test-error
+- Trong controller: try/catch ArithmeticException, gọi logger.error("...", e)
+- LogstashEncoder tự động đưa Exception vào field "stack_trace" trong JSON
+- Chạy app, gọi GET /test-error -> xem console/log file: mỗi log là 1 dòng JSON
+- Push code lên GitHub, copy link nộp Portal
