@@ -1,0 +1,10 @@
+- Đổi FileAppender -> RollingFileAppender
+- Thêm rollingPolicy class SizeAndTimeBasedRollingPolicy
+- fileNamePattern: logs/app-%d{yyyy-MM-dd}.%i.log
+- maxFileSize: 10MB
+- maxHistory: 30
+- Giữ nguyên encoder pattern cũ
+- Root logger giữ appender-ref FILE (và CONSOLE nếu cần)
+- Chạy app, log ghi vào logs/app.log
+- Khi vượt 10MB sẽ tự tách thành app-2023-10-25.0.log, .1.log...
+- Push code lên GitHub, copy link nộp Portal
