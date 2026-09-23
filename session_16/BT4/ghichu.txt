@@ -1,0 +1,7 @@
+- Mở logback-spring.xml
+- Trong encoder LogstashEncoder, thêm tag <customFields>
+- Nội dung: {"app_name":"order-service", "env":"production"}
+- Thêm cho cả appender CONSOLE và FILE
+- Chạy app, gọi 1 API bất kỳ (VD /test-log) để log ra
+- Kiểm tra JSON log: mỗi dòng đều có "app_name":"order-service" và "env":"production"
+- Push code lên GitHub, copy link nộp Portal
