@@ -1,0 +1,22 @@
+Nguyen nhan: application.properties dang co logging.level.root=INFO va logging.level.com.example.loggingdemo.service=TRACE co dinh cho moi moi truong. Chay tren Production van sinh log qua nhieu (TRACE), gay tran o cung.
+
+Cach sua - dung Spring Profiles:
+1. Xoa cau hinh log trong application.properties (giu lai cac dong khac), chi de comment ghi chu log cau hinh o file rieng theo profile.
+2. Tao application-dev.yml:
+   logging:
+     level:
+       root: DEBUG
+       com.example.loggingdemo: DEBUG
+3. Tao application-prod.yml:
+   logging:
+     level:
+       root: INFO
+       com.example.loggingdemo: INFO
+
+Cach chay kiem chung:
+java -jar app.jar --spring.profiles.active=prod
+(hoac: mvn spring-boot:run -Dspring-boot.run.profiles=prod)
+
+Ket qua: chay voi profile prod thi console chi hien log tu muc INFO tro len, khong con DEBUG/TRACE. Chay voi profile dev thi hien day du DEBUG de de debug.
+
+Luu y: logback-spring.xml dang set cung <root level="INFO">, tach biet voi application.properties/yml. Muc log trong application-{profile} se duoc Spring Boot ap dung de ghi de len logger tuong ung luc khoi dong, nen khong xung dot voi logback-spring.xml. Bai nay khong yeu cau sua file logback nen giu nguyen.
