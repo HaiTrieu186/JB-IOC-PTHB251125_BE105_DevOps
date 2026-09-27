@@ -1,0 +1,13 @@
+- Tạo class DiscordAppender extends AppenderBase<ILoggingEvent>
+- Override append(): kiểm tra event.getLevel() == ERROR mới xử lý, còn lại return
+- Dùng java.net.http.HttpClient (không dùng RestTemplate vì appender khởi tạo trước Spring Context)
+- start(): khởi tạo HttpClient, validate webhookUrl đã được set chưa
+- Build payload JSON dạng {"content": "..."} (chuẩn Discord webhook)
+- Escape ký tự đặc biệt trong message trước khi nhét vào JSON
+- Gửi POST bằng httpClient.sendAsync(...) -> không block thread ghi log
+- Thêm setter setWebhookUrl() để Logback tự inject giá trị từ XML
+- logback-spring.xml: khai báo appender DISCORD, class trỏ đúng package, có tag <webhookUrl>
+- Thêm appender-ref DISCORD vào root
+- Tạo TestDiscordController, endpoint /test-discord gọi log.error(...)
+- Chạy app, gọi API /test-discord -> kiểm tra kênh Discord nhận được tin nhắn đỏ
+- Thay webhookUrl trong logback-spring.xml bằng URL webhook thật của kênh Discord trước khi chạy
