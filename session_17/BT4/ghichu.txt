@@ -1,0 +1,14 @@
+Phân tích lỗi:
+- LogstashTcpSocketAppender gốc chạy đồng bộ (synchronous)
+- Mỗi lần log, thread chính phải chờ ghi xong qua TCP tới Logstash mới chạy tiếp
+- Khi Logstash nghẽn (10.000 dòng/s không xử lý kịp), thread chính bị block/timeout
+- Gây chậm hoặc lỗi cho luồng xử lý nghiệp vụ chính (request của user)
+
+Cách sửa:
+- Bọc appender TCP trong AsyncAppender
+- AsyncAppender đẩy log vào hàng đợi (queue) trong bộ nhớ trước
+- Một thread riêng sẽ lấy log từ queue và gửi đi, không ảnh hưởng thread chính
+- queueSize: 1024 - kích thước hàng đợi
+- neverBlock: true - không bao giờ block thread chính dù queue đầy (log mới sẽ bị drop thay vì chờ)
+- discardingThreshold: 0 - không tự động bỏ log khi queue gần đầy (giữ nguyên mọi log nếu còn chỗ)
+- Kết quả: app chính chạy mượt, không bị timeout dù Logstash xử lý chậm

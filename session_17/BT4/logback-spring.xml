@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- Appender TCP goc, gui log JSON sang Logstash -->
+    <appender name="LOGSTASH_TCP" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>logstash:5000</destination>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"app_name":"order-service", "env":"production"}</customFields>
+        </encoder>
+    </appender>
+
+    <!-- Boc AsyncAppender ben ngoai de khong block luong xu ly chinh -->
+    <appender name="ASYNC_LOGSTASH" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="LOGSTASH_TCP"/>
+        <!-- Kich thuoc hang doi trong bo nho -->
+        <queueSize>1024</queueSize>
+        <!-- Khong bao gio block thread chinh, du hang doi day -->
+        <neverBlock>true</neverBlock>
+        <!-- Nguong con lai trong queue de bat dau bo qua log level thap (INFO/DEBUG), giu lai WARN/ERROR -->
+        <discardingThreshold>0</discardingThreshold>
+        <includeCallerData>false</includeCallerData>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="ASYNC_LOGSTASH"/>
+    </root>
+
+</configuration>
