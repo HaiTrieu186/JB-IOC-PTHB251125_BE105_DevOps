@@ -1,0 +1,13 @@
+Phân tích lỗi:
+- FileAppender chỉ ghi nối tiếp vào 1 file duy nhất, không bao giờ tự cắt/xóa
+- Sau 3 tháng chạy liên tục, file application.log phình lên 40GB
+- Disk đầy 100% -> server không còn chỗ ghi, VPS bị sập (treo)
+
+Cách sửa:
+- Đổi FileAppender -> RollingFileAppender
+- rollingPolicy dùng SizeAndTimeBasedRollingPolicy (kết hợp cả ngày và dung lượng)
+- fileNamePattern: logs/application-%d{yyyy-MM-dd}.%i.log
+- maxFileSize: 10MB -> trong 1 ngày nếu vượt 10MB sẽ tách sang .1.log, .2.log...
+- maxHistory: 30 -> chỉ giữ log 30 ngày gần nhất, log cũ hơn tự động bị xóa
+- totalSizeCap: 1GB -> giới hạn cứng tổng dung lượng toàn bộ log, thêm 1 lớp bảo vệ chống tràn ổ đĩa ngay cả khi maxHistory chưa kịp dọn kịp
+- Kết quả: log tự xoay vòng, không còn nguy cơ chiếm hết dung lượng ổ cứng
