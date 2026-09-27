@@ -1,0 +1,21 @@
+# Doi spring.application.name khac nhau o moi service: api-gateway / order-service / user-service
+spring:
+  application:
+    name: order-service
+
+management:
+  tracing:
+    sampling:
+      # 1.0 = ghi lai 100% request, phuc vu demo/test (production nen giam xuong 0.1)
+      probability: 1.0
+  zipkin:
+    tracing:
+      # Khong cai Zipkin server, endpoint nay khong ton tai nen se log loi gui that bai
+      # nhung khong anh huong: tracing van hoat dong, log van co traceId/spanId
+      endpoint: http://localhost:9411/api/v2/spans
+
+logging:
+  pattern:
+    # Micrometer tracing tu dong put traceId, spanId vao MDC
+    # console mac dinh cua Spring Boot 3 da co san dang nay, khai bao lai cho ro
+    level: "[${spring.application.name},%X{traceId},%X{spanId}] %5p"

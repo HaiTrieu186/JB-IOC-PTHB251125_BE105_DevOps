@@ -1,0 +1,16 @@
+- Thêm 2 dependency vào pom.xml của CẢ 3 service (Gateway, Order, User):
+  micrometer-tracing-bridge-brave và zipkin-reporter-brave
+- Không cần cài Zipkin server thật, chỉ cần dependency là log đã tự sinh traceId/spanId
+- application.yml: đặt spring.application.name riêng cho từng service
+- management.tracing.sampling.probability: 1.0 để ghi lại 100% request (demo)
+- logback-spring.xml: thêm %X{traceId}, %X{spanId} vào pattern, kèm tên service
+  -> log dạng [order-service, traceId, spanId] LEVEL - message
+- QUAN TRỌNG để traceId đi xuyên suốt 3 service:
+  RestTemplate/WebClient PHẢI được tạo qua Builder (RestTemplateBuilder/WebClient.Builder)
+  do Spring quản lý, không được tự "new RestTemplate()"
+  -> Builder mới được Micrometer tự động gắn interceptor nhét traceId vào HTTP header
+- Luồng: Client gọi Gateway (sinh traceId mới) -> Gateway gọi Order Service (giữ nguyên traceId,
+  spanId mới) -> Order Service gọi User Service (vẫn giữ nguyên traceId)
+- Chạy cả 3 service, gọi 1 request xuyên suốt
+- Kiểm tra log ở cả 3 service: traceId giống hệt nhau, spanId khác nhau theo từng bước gọi
+- Khi User Service lỗi, chỉ cần copy traceId đó grep trong log cả 3 service là ra full luồng
