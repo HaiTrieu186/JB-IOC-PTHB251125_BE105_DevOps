@@ -1,0 +1,9 @@
+<!-- Vi du ben user-service -->
+<encoder class="net.logstash.logback.encoder.LogstashEncoder">
+    <customFields>{"app_name":"user-service", "env":"production"}</customFields>
+</encoder>
+
+<!-- Vi du ben order-service -->
+<encoder class="net.logstash.logback.encoder.LogstashEncoder">
+    <customFields>{"app_name":"order-service", "env":"production"}</customFields>
+</encoder>

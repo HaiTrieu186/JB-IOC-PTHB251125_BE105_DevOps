@@ -1,0 +1,8 @@
+- Lỗi gốc: index => "logstash-%{+YYYY.MM.dd}" -> mọi service dồn chung 1 index
+- Sửa lại: index => "%{[app_name]}-%{+YYYY.MM.dd}"
+- app_name lấy từ field JSON do logback (customFields) gửi sang
+- Mỗi service (user-service, order-service...) cần set customFields app_name riêng trong logback-spring.xml
+- Logstash tự động tách log theo giá trị app_name thành nhiều index khác nhau
+- Chạy hệ thống, gửi log từ user-service và order-service
+- Kiểm tra: GET _cat/indices trên Elasticsearch
+- Kết quả mong đợi: thấy user-service-2026.x.x và order-service-2026.x.x tách riêng
