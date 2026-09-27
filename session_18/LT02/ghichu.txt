@@ -1,0 +1,11 @@
+- Lỗi gốc: filter sinh UUID nhưng không put vào MDC -> log không có requestId
+- Sửa RequestIdFilter:
+  - MDC.put("requestId", requestId) trước khi filterChain.doFilter()
+  - Đặt trong try/finally, bắt buộc MDC.remove("requestId") ở finally
+  - Lý do phải remove: thread trong pool được tái sử dụng, không xóa sẽ dính requestId cũ sang request khác
+- logback-spring.xml:
+  - Console: thêm %X{requestId} vào pattern
+  - File (JSON): bật includeMdcData=true trong LogstashEncoder -> requestId tự động thành field JSON
+- Chạy app, gọi 2-3 request khác nhau
+- Kiểm tra: mỗi request có 1 UUID riêng, các dòng log cùng request có chung requestId
+- Trên Kibana: filter theo field requestId để xem toàn bộ log của 1 giao dịch
