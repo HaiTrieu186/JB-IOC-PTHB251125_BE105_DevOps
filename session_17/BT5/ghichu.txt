@@ -1,0 +1,12 @@
+- Spring Boot chỉ dùng RollingFileAppender ghi ra logs/storex.log (không dùng TCP appender nữa)
+- App hoàn toàn không biết tới Logstash/Elasticsearch/Kibana
+- Filebeat đọc file storex.log qua volume dùng chung (storex-logs) với app
+- filebeat.yml: input type log, paths trỏ tới /var/log/storex/storex.log
+- json.keys_under_root: true -> parse JSON log thành field, không phải string thô
+- output.elasticsearch: đẩy thẳng vào Elasticsearch (không qua Logstash)
+- index đặt tên storex-filebeat-yyyy.MM.dd
+- docker-compose.yml: thêm service filebeat, mount filebeat.yml và volume storex-logs
+- App và Filebeat dùng chung 1 volume storex-logs để chia sẻ file log
+- Chạy: docker compose up -d
+- Kiểm tra: GET _cat/indices thấy index storex-filebeat-*
+- Vào Kibana tạo index pattern storex-filebeat-* để xem log

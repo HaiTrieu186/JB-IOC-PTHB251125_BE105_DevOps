@@ -1,0 +1,57 @@
+version: "3.8"
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    networks:
+      - efk-network
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.0
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - efk-network
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:7.17.0
+    container_name: filebeat
+    user: root
+    volumes:
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - storex-logs:/var/log/storex
+    depends_on:
+      - elasticsearch
+      - kibana
+    networks:
+      - efk-network
+
+  # Spring Boot app - chi ghi log ra file, khong biet gi ve EFK
+  storex-app:
+    build: .
+    container_name: storex-app
+    volumes:
+      - storex-logs:/app/logs
+    ports:
+      - "8080:8080"
+    networks:
+      - efk-network
+
+networks:
+  efk-network:
+    driver: bridge
+
+volumes:
+  storex-logs:
