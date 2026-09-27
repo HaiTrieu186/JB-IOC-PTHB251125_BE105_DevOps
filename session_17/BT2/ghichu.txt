@@ -1,0 +1,10 @@
+- Lỗi gốc: input tcp port 5000 dùng codec plain mặc định, không parse được JSON
+- Sửa lại: thêm codec => json_lines vào input tcp
+- Giữ nguyên output elasticsearch, thêm index đặt tên theo ngày (storex-log-%{+YYYY.MM.dd})
+- Thêm service logstash vào docker-compose.yml
+- Mount file logstash.conf vào /usr/share/logstash/pipeline/logstash.conf
+- Mở port 5000 cho logstash để Spring Boot gửi TCP log tới
+- depends_on: elasticsearch để logstash khởi động sau
+- Chạy: docker compose up -d
+- Kiểm tra log logstash: docker logs -f logstash (không còn lỗi parse)
+- Kiểm tra Elasticsearch có index storex-log-* : curl http://localhost:9200/_cat/indices
