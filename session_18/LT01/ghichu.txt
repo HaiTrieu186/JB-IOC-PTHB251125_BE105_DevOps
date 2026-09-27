@@ -1,0 +1,12 @@
+- Thêm dependency spring-boot-starter-actuator vào pom.xml
+- application.yml: management.endpoints.web.exposure.include thêm "loggers" (health,info,loggers)
+- Chạy app, không restart trong lúc test
+- Xem log level hiện tại: GET http://localhost:8080/actuator/loggers/com.storex.payment
+- Đổi log level sang DEBUG bằng Postman:
+  - Method: POST
+  - URL: http://localhost:8080/actuator/loggers/com.storex.payment
+  - Header: Content-Type: application/json
+  - Body: {"configuredLevel": "DEBUG"}
+- Hoặc dùng curl:
+  curl -X POST http://localhost:8080/actuator/loggers/com.storex.payment -H "Content-Type: application/json" -d "{\"configuredLevel\":\"DEBUG\"}"
+- Kiểm tra console: log DEBUG của package com.storex.payment xuất hiện ngay, không cần restart
