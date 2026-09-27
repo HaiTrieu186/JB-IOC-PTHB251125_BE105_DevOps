@@ -1,0 +1,12 @@
+- Lỗi gốc: ELASTICSEARCH_HOSTS=http://elasticsearch:9300 (9300 là port transport, không phải HTTP)
+- Sửa lại: ELASTICSEARCH_HOSTS=http://elasticsearch:9200 (9200 là port HTTP của Elasticsearch)
+- Thêm ports 9200:9200 cho elasticsearch để truy cập/test từ ngoài
+- Thêm ports 5601:5601 cho kibana
+- Thêm depends_on: elasticsearch cho kibana (khởi động đúng thứ tự)
+- Thêm network chung efk-network cho 2 service liên lạc bằng tên service
+- Thêm xpack.security.enabled=false để dev nhanh, khỏi cần đăng nhập
+- Chạy: docker compose up -d
+- Kiểm tra: docker ps (2 container đang chạy)
+- Kiểm tra: curl http://localhost:9200 (Elasticsearch trả JSON)
+- Truy cập: http://localhost:5601 (Kibana lên giao diện, không còn lỗi "server is not ready yet")
+
